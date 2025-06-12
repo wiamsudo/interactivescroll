@@ -29,12 +29,11 @@
             align-items: center;
             overflow: hidden;
             perspective: 1000px;
-            /* --- CORRECTIE: Vervangen van placeholder met een echte golfbaan-afbeelding --- */
             background: url('https://images.unsplash.com/photo-1535131749006-b7f58c99034b?q=80&w=2070&auto=format&fit=crop') no-repeat center center;
             background-size: cover;
         }
         .golf-ball {
-            width: 30px; /* Iets kleiner voor beter perspectief */
+            width: 30px;
             height: 30px;
             background: radial-gradient(circle at 10px 10px, #fefefe, #e0e0e0);
             border-radius: 50%;
@@ -48,7 +47,7 @@
         .golf-club {
             position: absolute;
             width: 150px;
-            height: 25px; /* Iets dunner */
+            height: 25px;
             background: linear-gradient(to right, #4b5563, #1f2937);
             border-radius: 15px 5px 5px 15px;
             transform-origin: 10% 50%;
@@ -56,19 +55,17 @@
             will-change: transform;
         }
         .golf-hole {
-            width: 60px; /* Iets kleiner, passend bij de bal */
+            width: 60px;
             height: 60px;
             background-color: #000000;
             border-radius: 50%;
             position: absolute;
-            /* --- CORRECTIE: Gecentreerd aan de bovenkant voor correcte animatie --- */
-            top: -100px; /* Start buiten beeld bovenaan */
+            top: -100px;
             left: 50%;
-            transform: translateX(-50%); /* Horizontaal centreren */
+            transform: translateX(-50%);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
             z-index: 10;
             will-change: transform;
-            /* Verwijder de vlag voor een schoner 'gat in de grond' effect */
         }
         .quote-box {
             position: absolute;
@@ -150,9 +147,10 @@
         }
 
         async function fetchGolfQuote() {
-            // Placeholder functie voor de quote
             const quotes = [
-                "hoi wouter",
+                "Golf is a game in which you yell 'fore,' shoot six, and write down five.",
+                "My swing is so bad, I look like a caveman killing his lunch.",
+                "The only thing that's straight on a golf course is the ball boy."
             ];
             return quotes[Math.floor(Math.random() * quotes.length)];
         }
@@ -161,16 +159,14 @@
         let quoteVisible = false;
 
         function updateAnimation() {
-            isAnimating = false; // Reset flag
+            isAnimating = false;
             const scrollPercentage = window.scrollY / (document.querySelector('.scroll-area').offsetHeight - window.innerHeight);
 
-            // --- CORRECTIE: Vereenvoudigde startpositie van de bal ---
-            const startBallY = window.innerHeight * 0.35; // Startpositie onderaan het scherm
+            const startBallY = window.innerHeight * 0.35;
 
-            // Fase 1: De slag (0% - 10%)
             if (scrollPercentage <= 0.1) {
                 const hitProgress = scrollPercentage / 0.1;
-                const clubRotation = -45 + hitProgress * 90; // Swing van -45 naar 45 graden
+                const clubRotation = -45 + hitProgress * 90;
                 golfClub.style.transform = `translate(-50px, ${startBallY - 20}px) rotate(${clubRotation}deg)`;
                 golfBall.style.transform = `translate(0px, ${startBallY}px) scale(1)`;
                 golfBall.style.opacity = '1';
@@ -180,19 +176,17 @@
                     quoteVisible = false;
                 }
             }
-            // Fase 2: De vlucht (10% - 90%)
             else if (scrollPercentage > 0.1 && scrollPercentage < 0.9) {
                 const flightProgress = (scrollPercentage - 0.1) / 0.8;
                 const screenWidth = window.innerWidth;
                 const screenHeight = window.innerHeight;
 
-                // Parabolische vlucht
-                const ballX = flightProgress * (screenWidth * 0.1); // Lichte horizontale afwijking
-                const ballY = startBallY - (Math.sin(flightProgress * Math.PI) * (screenHeight * 0.7)); // Boog
+                const ballX = flightProgress * (screenWidth * 0.1);
+                const ballY = startBallY - (Math.sin(flightProgress * Math.PI) * (screenHeight * 0.7));
                 const ballRotation = flightProgress * 1080;
 
                 golfBall.style.transform = `translate(${ballX}px, ${ballY}px) rotateZ(${ballRotation}deg) scale(1)`;
-                golfClub.style.transform = 'translate(-200px, 200px) rotate(45deg)'; // Club uit beeld
+                golfClub.style.transform = 'translate(-200px, 200px) rotate(45deg)';
 
                 if (!quoteVisible) {
                     fetchGolfQuote().then(quote => {
@@ -202,22 +196,20 @@
                     quoteVisible = true;
                 }
             }
-            // Fase 3: Landing bij de hole (90% - 100%)
             else {
                 const landingProgress = (scrollPercentage - 0.9) / 0.1;
                 const screenHeight = window.innerHeight;
                 const finalY = screenHeight * 0.5 - golfHole.offsetHeight / 2;
 
-                // Landingspunt berekenen
                 const startLandingY = startBallY - (Math.sin(0.9 * Math.PI) * (screenHeight * 0.7));
-                const ballX = 0; // Bal landt in het midden
+                const ballX = 0;
                 const ballY = startLandingY + (finalY - startLandingY) * landingProgress;
-                const scale = 1 - landingProgress * 0.9; // Krimpt bij naderen van hole
+                const scale = 1 - landingProgress * 0.9;
 
                 golfBall.style.transform = `translate(${ballX}px, ${ballY}px) scale(${scale})`;
                 
                 if (landingProgress >= 0.98 && golfBall.style.opacity !== '0') {
-                    golfBall.style.opacity = '0'; // Verdwijnt in de hole
+                    golfBall.style.opacity = '0';
                     showMessageBox("Hole-in-one! Goed gedaan!");
                 } else if (landingProgress < 0.98) {
                      golfBall.style.opacity = '1';
@@ -229,17 +221,14 @@
                 }
             }
 
-            // --- CORRECTIE: Hole beweegt naar het midden van het scherm ---
             const holeTargetY = window.innerHeight / 2 - golfHole.offsetHeight / 2;
             const holeCurrentY = -100 + scrollPercentage * (holeTargetY + 100);
             golfHole.style.transform = `translate(-50%, ${holeCurrentY}px)`;
             
-            // Parallax achtergrond
             const backgroundMovement = -scrollPercentage * 100;
             animationContainer.style.backgroundPosition = `center ${backgroundMovement}px`;
         }
         
-        // --- CORRECTIE: Efficiëntere animatieloop ---
         function onScroll() {
             if (!isAnimating) {
                 isAnimating = true;
@@ -250,7 +239,6 @@
         window.addEventListener('scroll', onScroll);
         window.addEventListener('resize', onScroll);
 
-        // Start de animatie bij het laden van de pagina
         window.onload = onScroll;
     </script>
 </body>
